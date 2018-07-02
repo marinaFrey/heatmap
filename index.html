@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author: Mostapha Roudsari" content="">
+
+	<title>Heat Map</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="heatmap.js"></script>
+    <script src="zoomedHeatmap.js"></script>
+
+<style>
+	body {
+	   font-family: sans-serif;
+	   font-size: 12px;
+	 }
+
+	.axis text {
+        font: 10px sans-serif;
+      }
+
+	.axis path,
+	.axis line {
+		fill: none;
+	    stroke: #000;
+	    shape-rendering: crispEdges;
+	}
+
+</style>
+
+</head>
+
+<body>
+    <div>
+        <div style="width:100%;position: relative;" flex>
+            <svg id="svg_id" style="position: absolute; left: 0px; top:0px; z-index: 2;" flex></svg>
+            <canvas id="canvas_id" style="position: absolute; left: 0px; top:0px; z-index: 2;" flex></canvas> 
+        </div>
+        <div style="width:100%;position: relative;">
+            <svg id="svg_zoom_id" style="position: absolute; right: 0px; top:0px; z-index: 2;" flex></svg>
+            <canvas id="canvas_zoom_id" style="position: absolute; right: 0px; top:0px; z-index: 2;" flex></canvas> 
+        </div>
+    </div>
+    
+
+<script>
+    var drag = false;
+    var initialY;
+    var rect = {};
+
+    var nQuestionnaires = 39;
+    var nParticipants = 10000;
+    var participants = [];
+    var questionnaires = [];
+    var data = [];
+    
+    for(var j = 0; j < nParticipants; j++)
+    {
+        participants.push('P'+j);      
+        for(var i = 0; i < nQuestionnaires; i++)
+        {
+            var random = Math.random();
+            var value;
+
+            if (random < 0.34) 
+            {
+                value = -1;
+            } else if(random <= 0.67) 
+            {
+                value = 0;
+            } else 
+            {
+                value = 1;
+            }
+
+            data.push({participant:'P'+j, questionnaire: 'Q'+i, value: value} );
+        }
+    }
+
+    for(var j = 0; j < nQuestionnaires; j++)
+    {
+        questionnaires.push('Q'+j);
+    }
+
+    var tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .text("a simple tooltip");
+
+    var matrix = new matrixVisualization();
+    matrix.update();
+
+    var zoomMatrix = new matrixZoomVisualization();
+
+</script>
+</body>
+
+</html>

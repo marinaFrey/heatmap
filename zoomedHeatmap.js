@@ -27,23 +27,23 @@ function matrixZoomVisualization()
 
     var context = canvas_matrix_viz.node().getContext('2d');
 
-    x = d3.scale.ordinal()
+    x = d3.scaleBand()
       .domain(questionnaires)
-      .rangeBands([0, width]);
+      .range([0, width]);
 
-    y = d3.scale.ordinal()
+    y = d3.scaleBand()
       .domain(selectedParticipants)
-      .rangeBands([0, height]);
+      .range([0, height]);
 
 
-    var colorMap = d3.scale.linear()
+    var colorMap = d3.scaleLinear()
       .domain([-1, 0, 1])
       .range(["red", "yellow", "green"]);
 
     data.forEach(function(d,i)
     {
       context.beginPath();
-      context.rect(x(d.questionnaire), y(d.participant), x.rangeBand(), y.rangeBand());
+      context.rect(x(d.questionnaire), y(d.participant), x.bandwidth(), y.bandwidth());
       context.fillStyle=colorMap(d.value);
       context.fill();
       context.closePath();
@@ -53,7 +53,7 @@ function matrixZoomVisualization()
     var timeDiff = endTime - startTime; //in ms
     console.log(timeDiff + " ms para versao zoom");
 
-    canvas = canvas_matrix_viz[0][0];
+    canvas = canvas_matrix_viz._groups[0][0];
 
     canvas.addEventListener('mousemove', function(evt) 
     {

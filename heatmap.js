@@ -27,25 +27,22 @@ function matrixVisualization()
 
     var context = canvas_matrix_viz.node().getContext('2d');
 
-    x = d3.scale.ordinal()
+    x = d3.scaleBand()
       .domain(questionnaires)
-      .rangeBands([0, width]);
+      .range([0, width]);
 
-    y = d3.scale.ordinal()
+    y = d3.scaleBand()
       .domain(participants)
-      //.domain(d3.extent(data, function(p){return p.participant}))
-      //.domain(d3.range(nParticipants))
-      .rangeBands([0, height]);
+      .range([0, height]);
 
-
-    var colorMap = d3.scale.linear()
+    var colorMap = d3.scaleLinear()
       .domain([-1, 0, 1])
       .range(["red", "yellow", "green"]);
 
     data.forEach(function(d,i)
     {
       context.beginPath();
-      context.rect(x(d.questionnaire), y(d.participant), x.rangeBand(), y.rangeBand());
+      context.rect(x(d.questionnaire), y(d.participant), x.bandwidth(), y.bandwidth());
       context.fillStyle=colorMap(d.value);
       context.fill();
       context.closePath();
@@ -55,7 +52,7 @@ function matrixVisualization()
     var timeDiff = endTime - startTime; //in ms
     console.log(timeDiff + " ms");
 
-    canvas = canvas_matrix_viz[0][0];
+    canvas = canvas_matrix_viz._groups[0][0];
 
     
     canvas.addEventListener('mousedown', function(evt)
@@ -160,24 +157,21 @@ function getMousePos(canvas, evt)
 function getParticipantFromYCoordinate(canvas, evt, y)
 {
   var mousePos = getMousePos(canvas, evt);
-  var leftEdgesY = y.range();
-  var widthY = y.rangeBand();
-  var i;
-  for(i=0; mousePos.y > (leftEdgesY[i] + widthY); i++) {}
+  var inverseModeScale = d3.scaleQuantize()
+    .domain(y.range())
+    .range(y.domain());
 
-  return y.domain()[i];
+  return inverseModeScale(mousePos.y);
 }
 
 function getQuestionnaireFromXCoordinate(canvas, evt, x)
 {
   var mousePos = getMousePos(canvas, evt);
-  var leftEdgesX = x.range();
-  var widthX = x.rangeBand();
-  var j;
-  for(j=0; mousePos.x > (leftEdgesX[j] + widthX); j++) {}
-      //do nothing, just increment j until case fails
-      
-  return x.domain()[j];
+  var inverseModeScale = d3.scaleQuantize()
+    .domain(x.range())
+    .range(x.domain());
+
+  return inverseModeScale(mousePos.x);
 
 }
 

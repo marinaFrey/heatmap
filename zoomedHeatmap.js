@@ -13,9 +13,8 @@ function matrixZoomVisualization()
   {
     var startTime = new Date();
 
-    var margin = { top: 100, right: 100, bottom: 100, left: 100 },
-      width = 900,
-      height = 900;
+    var height = 900,
+        width = height;
 
     var canvas_matrix_viz = d3.select("#canvas_zoom_id")
       .attr("width", width + margin.left + margin.right)
@@ -38,8 +37,18 @@ function matrixZoomVisualization()
 
     var colorMap = d3.scaleLinear()
       .domain([-1, 0, 1])
-      .range(["red", "yellow", "green"]);
+      .range(["#ef5545", "#fcff82", "#91ef45"]);
 
+    svg.selectAll("*").remove();
+    zoomRect = svg
+      .append("rect")
+      .style("fill", "black")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", x.range()[1])
+      .attr("height", y.bandwidth())
+      .style("opacity", 0.2);
+    
     data.forEach(function(d,i)
     {
       context.beginPath();
@@ -55,19 +64,22 @@ function matrixZoomVisualization()
 
     canvas = canvas_matrix_viz._groups[0][0];
 
-    canvas.addEventListener('mousemove', function(evt) 
+    document.getElementById('zoom_id').addEventListener('mousemove', function(evt) 
     {
         var participant =  getParticipantFromYCoordinate(canvas, evt, y);   
         var questionnaire = getQuestionnaireFromXCoordinate(canvas, evt, x);
+
         if(questionnaire && participant)
         {
+            zoomRect.attr("y", y(participant));
+
             tooltip.style("visibility", "visible");
             tooltip.text("Participante: " + participant + "; Questionario: " + questionnaire);
             tooltip.style("top", (evt.pageY-10)+"px").style("left",(evt.pageX+10)+"px");
         }
     }, false);
 
-    canvas.addEventListener("mouseout", function(evt)
+    document.getElementById('zoom_id').addEventListener("mouseout", function(evt)
     {
       return tooltip.style("visibility", "hidden");
     });

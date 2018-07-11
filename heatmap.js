@@ -13,9 +13,8 @@ function matrixVisualization()
   {
     var startTime = new Date();
 
-    var margin = { top: 100, right: 100, bottom: 100, left: 100 },
-      width = 200,
-      height = 900;
+    var height = 900,
+        width = height/4.5;
 
     var canvas_matrix_viz = d3.select("#canvas_id")
       .attr("width", width + margin.left + margin.right)
@@ -53,9 +52,9 @@ function matrixVisualization()
     console.log(timeDiff + " ms");
 
     canvas = canvas_matrix_viz._groups[0][0];
-
+    canvasWrapper = document.getElementById('overview_id');
     
-    canvas.addEventListener('mousedown', function(evt)
+    canvasWrapper.addEventListener('mousedown', function(evt)
     {
       drag = true;
     
@@ -64,15 +63,16 @@ function matrixVisualization()
       svg.selectAll("*").remove();
       rect = svg
         .append("rect")
-        .style("fill", "grey")
+        .style("fill", "black")
         .attr("x", 0)
         .attr("y", y(initialY))
         .attr("width", width)
-        .attr("height", 1);
+        .attr("height", 1)
+        .attr("opacity",0.3);
 
     }, false);
 
-    canvas.addEventListener('mouseup', function(evt)
+    canvasWrapper.addEventListener('mouseup', function(evt)
     {
       drag = false;
       var finalY = getParticipantFromYCoordinate(canvas, evt, y);
@@ -114,14 +114,21 @@ function matrixVisualization()
 
     }, false);
 
-    canvas.addEventListener('mousemove', function(evt) 
+    canvasWrapper.addEventListener('mousemove', function(evt) 
     {
       var participant =  getParticipantFromYCoordinate(canvas, evt, y);
 
       if(drag)
       {
         tooltip.style("visibility", "hidden");
-        rect.attr("height", y(participant) - y(initialY));
+        if(y(participant) - y(initialY) > 0)
+          rect.attr("height", y(participant) - y(initialY));
+        else
+        {
+          //rect
+          //  .attr("y", y(participant))
+          //  .attr("height",  y(initialY) -  y(participant));
+        }
       }
       else
       {      
@@ -137,7 +144,7 @@ function matrixVisualization()
       
     }, false);
 
-    canvas.addEventListener("mouseout", function(evt)
+    canvasWrapper.addEventListener("mouseout", function(evt)
     {
       return tooltip.style("visibility", "hidden");
     });
@@ -174,4 +181,3 @@ function getQuestionnaireFromXCoordinate(canvas, evt, x)
   return inverseModeScale(mousePos.x);
 
 }
-

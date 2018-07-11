@@ -37,22 +37,25 @@
 </head>
 
 <body>
-    <div>
-        <div style="width:100%;position: relative;" flex>
-            <svg id="svg_id" style="position: absolute; left: 0px; top:0px; z-index: 2;" flex></svg>
-            <canvas id="canvas_id" style="position: absolute; left: 0px; top:0px; z-index: 2;" flex></canvas> 
+    <div flex>
+        <div id="overview_id" style="position: relative;" >
+            <canvas id="canvas_id" style="position: absolute; left: 0px; top:0px; z-index: 2;" ></canvas> 
+            <svg id="svg_id" style="position: absolute; left: 0px; top:0px; z-index: 2;" ></svg>
         </div>
-        <div style="width:100%;position: relative;">
-            <svg id="svg_zoom_id" style="position: absolute; right: 0px; top:0px; z-index: 2;" flex></svg>
-            <canvas id="canvas_zoom_id" style="position: absolute; right: 0px; top:0px; z-index: 2;" flex></canvas> 
+        <div id="zoom_id" style="position: relative;">
+            <canvas id="canvas_zoom_id" style="position: absolute; right: 0px; top:0px; z-index: 2;" ></canvas> 
+            <svg id="svg_zoom_id" style="position: absolute; right: 0px; top:0px; z-index: 2;" ></svg>
         </div>
+        
     </div>
+   
     
 
 <script>
     var drag = false;
     var initialY;
     var rect = {};
+    var zoomRect = {};
 
     var nQuestionnaires = 39;
     var nParticipants = 5000;

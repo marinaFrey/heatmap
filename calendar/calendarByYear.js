@@ -1,4 +1,4 @@
-function createCalendarByMonth()
+function createCalendarByYear()
 {
     Date.prototype.toJSONLocal = function() 
     {
@@ -24,6 +24,12 @@ function createCalendarByMonth()
         result.setDate(date.getDate() + days);
         return result;
     } // From: http://stackoverflow.com/questions/563406/add-days-to-datetime
+
+    function addMonths(date, months) 
+    {
+        var result = new Date(date.getFullYear(),date.getMonth()+months,date.getDate());
+        return result;
+    } 
     
     //calendar array
     var calendar = [];
@@ -34,14 +40,11 @@ function createCalendarByMonth()
     //todays date
     var today = new Date();
 
-    //last Years date
-    var lastYear = addDays(today,-365);
-
-    //initialize column to 0
-    var col = 0;
+    // first year shown on the calendar
+    var firstYear = new Date(2000,0);
 
     //get the month of a year ago
-    var month = lastYear.getMonth();
+    var month = firstYear.getMonth();
 
     //boolean for first sunday
     var first = true;
@@ -51,13 +54,14 @@ function createCalendarByMonth()
     var tipFormatter = d3.timeFormat("%Y-%m-%d");
 
 
-
-    //for 365 days
-    for (i=0; i <= 365; i++)
+    //initialize column to 0
+    var col = 0;
+    var i = 0;
+    while(firstYear.getFullYear() != today.getFullYear() || firstYear.getMonth() != today.getMonth())
     {
 
         //get date as a string
-        dateString = lastYear.toJSONLocal();
+        dateString = firstYear.toJSONLocal();
 
         //make a UTC (no timezone offset) date
         var date = makeUTCDate(dateString);
@@ -65,27 +69,14 @@ function createCalendarByMonth()
         //c is current day of week
         var c = date.getDay();
 
-        //if sunday, if january, and it's the first sunday
-        if (c === 0 && date.getMonth() === 0 && first)
+        if(firstYear.getMonth() == 0)
         {
-            //set month to -1 to allow following if block to run
-            month = -1;
-            //only do this for the first Sunday
-            first = !first;
-        }
-
-        //if its sunday and a new month
-        if (c === 0 && date.getMonth() > month)
-        {
-            //add a new object to yAxis indicating the position and month for labeling
             yAxis.push({
                 col: col,
-                //month: yAxisFormatter(date)
-                month: date.toLocaleDateString("pt-BR", {month:"short"})
+                year: firstYear.getFullYear()
             });
-            month++;
-            
         }
+
         //add datum to calendar array including the date, initialized count, and column for positioning
         calendar.push(
         {
@@ -94,47 +85,42 @@ function createCalendarByMonth()
             col: col,
         });
 
-        //add next time through the loop, use the next day and if its a saturday start a new column
-        lastYear = addDays(lastYear,1);
-        if (c === 6){ col++; }
+        if (firstYear.getMonth() === 11){ col++; }
+        //add next time through the loop
+        firstYear = addMonths(firstYear,1);
+        
     }
+    console.log(calendar);
 
-    var margin = {top: 20, right: 0, bottom: 0, left: 20}; //margins
-
-    var width = $("#calendarByMonth").width();
-    var height = width/7;
-    var scale = d3.scaleBand().rangeRound([0, width-margin.left]).padding(0.15);
-    scale.domain(calendar.map(function(d) { return d.col; }));
-    var scaleWeekday = d3.scaleBand().rangeRound([0, height-margin.top]);
-    scaleWeekday.domain([0,1,2,3,4,5,6]);
-
-    
-    //var width = squareSize + (squareSize+padding)*54; // 1 square + 53 squares with 2px padding
-     //1 square + 12 squares with 2px padding
+    var margin = {top: 70, right: 70, bottom: 70, left: 90}; //margins
+    var padding = 4;
+    var squareSize = 21;
+    var w = $("#calendarByMonth").width();
+    var width = squareSize + (squareSize+padding)*54; // 1 square + 53 squares with 2px padding
+    var height = squareSize + (squareSize+padding)*12; //1 square + 12 squares with 2px padding
     var legendX = 540; //x Position for legend
     var legendY = height + 10; //y position for legend
 
     //append svg with a g object accounting for margins
-    var svg = d3.select("#calendarByMonth").append('svg')
+    var svg = d3.select("#calendarByYear").append('svg')
         .attr('width',width + margin.left + margin.right)
         .attr('height',height + margin.top + margin.bottom)
         .append('g')
         .attr('transform','translate('+margin.left+','+margin.top+')');
 
     //Lazy y-axis from GitHub's commit calendar
-    var weekdays = ['D','S','T','Q','Q','S','S'];
-    for(var i = 0; i < weekdays.length; i++)
-    {
-        createWeekdayLetter(weekdays[i],scaleWeekday(i),scaleWeekday.bandwidth()*0.7)
-    }
-    /*
-    createWeekdayLetter('D', scale.bandwidth()*0.7,scale.bandwidth()*0.7);
-    createWeekdayLetter('S', scale.bandwidth()*2,scale.bandwidth()*0.7);
-    createWeekdayLetter('T', scale.bandwidth()*3+padding,scale.bandwidth()*0.7);
-    createWeekdayLetter('Q', scale.bandwidth()*4+padding*2,scale.bandwidth()*0.7);
-    createWeekdayLetter('Q', scale.bandwidth()*5+padding*3,scale.bandwidth()*0.7);
-    createWeekdayLetter('S', scale.bandwidth()*6+padding*4,scale.bandwidth()*0.7);
-    createWeekdayLetter('S', scale.bandwidth()*7+padding*5,scale.bandwidth()*0.7);*/
+    createMonthLetter('J', squareSize*0.7,squareSize*0.7);
+    createMonthLetter('F', squareSize*2,squareSize*0.7);
+    createMonthLetter('M', squareSize*3+padding,squareSize*0.7);
+    createMonthLetter('A', squareSize*4+padding*2,squareSize*0.7);
+    createMonthLetter('M', squareSize*5+padding*3,squareSize*0.7);
+    createMonthLetter('J', squareSize*6+padding*4,squareSize*0.7);
+    createMonthLetter('J', squareSize*7+padding*5,squareSize*0.7);
+    createMonthLetter('A', squareSize*8+padding*6,squareSize*0.7);
+    createMonthLetter('S', squareSize*9+padding*7,squareSize*0.7);
+    createMonthLetter('O', squareSize*10+padding*8,squareSize*0.7);
+    createMonthLetter('N', squareSize*11+padding*9,squareSize*0.7);
+    createMonthLetter('D', squareSize*12+padding*10,squareSize*0.7);
 
     //Prepare Calendar
     svg.selectAll('.cal')
@@ -142,29 +128,31 @@ function createCalendarByMonth()
         .enter()
         .append('rect')
         .attr('class','cal')
-        .attr('width',scale.bandwidth())
-        .attr('height',scale.bandwidth())
-        .attr('x',function(d,i){return scale(d.col)})
-        .attr('y',function(d,i){return scaleWeekday(d.date.getDay());})
+        .attr('width',squareSize)
+        .attr('height',squareSize)
+        .attr('x',function(d,i){return d.col*(squareSize+padding);})
+        .attr('y',function(d,i){return d.date.getMonth() * (squareSize+padding);})
         .attr('fill','#eeeeee');
-
 
     var colorScale = d3.scaleThreshold() //based on http://www.perbang.dk/rgbgradient/ from #eee to #FF8C00
         .range(['#eeeeee','#eeeeee','#F2D5B2','#F6BD77','#FAA43B','#FF8C00']);
 
+        
     //Prepare y Axis
     svg.selectAll('.y')
         .data(yAxis)
         .enter()
         .append('text')
-        .text(function(d){ return d.month;})
-        .style("font-size", scale.bandwidth()*0.7+'px')
+        .text(function(d){ return d.year;})
         .attr('dy',-5)
         .attr('dx',function(d)
         {
-            return scale(d.col);
+            return d.col*(squareSize+padding);
         })
+        
         .attr('fill','#ccc');
+
+    svg.selectAll('text')
 
     var tooltipRect = svg.append('rect').style("opacity", 0);
     var tooltipText = svg.append('text').style("opacity", 0);
@@ -181,8 +169,9 @@ function createCalendarByMonth()
         var l = data.length;
         while(l--)
         {
+            var eventDate = new Date(data[l].date);
             //get the day of the event
-            var eventDate = data[l].date.substr(0,10);
+            eventDate = new Date(eventDate.getFullYear(), eventDate.getMonth()).toJSONLocal();
             //if the events object doesn't have the current event's day as a key, create a key and give it a value 0
             if(!events[eventDate])
             {
@@ -254,14 +243,14 @@ function createCalendarByMonth()
 
     });
 
-    function createWeekdayLetter(letter, position, size)
+    function createMonthLetter(letter, position, size)
     {
         svg.append('text')
             .text(letter)
             .attr('text-anchor','middle')
-            .style("font-size", size+'px')
             .style('fill','#ccc')
-            .attr('dx','0')
-            .attr('dy',position+margin.top);
+            .style("font-size", size+'px')
+            .attr('dx','-10')
+            .attr('dy',position);
     }
 }

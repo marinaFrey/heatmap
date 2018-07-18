@@ -18,8 +18,7 @@ function createCalendarByMonth()
         .append('g')
         .attr('transform','translate('+margin.left+','+margin.top+')');
     
-    var tooltipRect = svg.append('rect').style("opacity", 0);
-    var tooltipText = svg.append('text').style("opacity", 0);
+    
 
     for (i=0; i <= 365; i++)
     {
@@ -63,7 +62,7 @@ function createCalendarByMonth()
     var weekdays = ['D','S','T','Q','Q','S','S'];
     for(var i = 0; i < weekdays.length; i++)
     {
-        createWeekdayLetter(weekdays[i],scaleWeekday(i),scaleWeekday.bandwidth()*0.7)
+        createWeekdayLetter(weekdays[i],scaleWeekday(i)+scaleWeekday.bandwidth()*0.8,scaleWeekday.bandwidth()*0.7)
     }
 
     svg.selectAll('.cal')
@@ -90,6 +89,9 @@ function createCalendarByMonth()
         })
         .attr('fill','#ccc');
 
+    var tooltipRect = svg.append('rect').style("opacity", 0);
+    var tooltipText = svg.append('text').style("opacity", 0);
+    
     d3.json('mockup.json',function(error,data)
     {
         if (error) throw error;
@@ -191,6 +193,6 @@ function createCalendarByMonth()
             .style("font-size", size+'px')
             .style('fill','#ccc')
             .attr('dx','0')
-            .attr('dy',position+margin.top);
+            .attr('dy',position);
     }
 }

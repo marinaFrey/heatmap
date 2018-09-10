@@ -9,7 +9,7 @@ function matrixZoomVisualization()
   /*
    * creates and updates the visualization
    */
-  this.update = function (data, selectedParticipants) 
+  this.update = function (data) 
   {
     var startTime = new Date();
 
@@ -27,17 +27,21 @@ function matrixZoomVisualization()
     var context = canvas_matrix_viz.node().getContext('2d');
 
     x = d3.scaleBand()
-      .domain(questionnaires)
+      .domain(data.map(function(key,index){
+        return key.questionnaire;
+      }))
       .range([0, width]);
 
     y = d3.scaleBand()
-      .domain(selectedParticipants)
+      .domain(data.map(function(key,index){
+        return key.participant;
+      }))
       .range([0, height]);
 
 
     var colorMap = d3.scaleLinear()
-      .domain([-1, 0, 1])
-      .range(["#ef5545", "#fcff82", "#91ef45"]);
+      .domain([-1, 0, 1, 2])
+      .range(["#ef5545","white", "#fcff82", "#91ef45"]);
 
     svg.selectAll("*").remove();
     zoomRect = svg
@@ -48,7 +52,7 @@ function matrixZoomVisualization()
       .attr("width", x.range()[1])
       .attr("height", y.bandwidth())
       .style("opacity", 0.2);
-    
+
     data.forEach(function(d,i)
     {
       context.beginPath();
